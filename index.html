@@ -3,47 +3,166 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ladyluh's VRChat tools</title>
+<title>vpm · ladyluh</title>
+<meta name="description" content="VRChat Creator Companion listing for questkit, ps1ify and source2vrchat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #f7f5f8; --fg: #241f2b; --muted: #6b6475; --card: #ffffff; --line: #e4dfe9; --accent: #c2477f; --accent-fg: #ffffff; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #17141c; --fg: #ece8f1; --muted: #a39cad; --card: #211d28; --line: #332d3d; --accent: #e3699f; --accent-fg: #17141c; }
+  :root {
+    --bg: #07070b; --pane: rgba(10, 10, 16, .9); --line: rgba(31, 41, 55, .8); --card: #0e0e16;
+    --text: #d1d5db; --dim: #6b7280; --title: #4b5563; --white: #f3f4f6;
+    --pink: #f472b6; --pink-strong: #ec4899; --pink-bg: rgba(236, 72, 153, .1);
+    --mono: "Fira Code", ui-monospace, Consolas, monospace;
   }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
-  h1 { font-size: 1.8rem; margin: 0 0 6px; }
-  p.lead { color: var(--muted); margin: 0 0 28px; }
-  .add { display: inline-block; background: var(--accent); color: var(--accent-fg); text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
-  .url { margin: 14px 0 36px; font-size: .9rem; color: var(--muted); }
-  code { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; font-size: .88em; word-break: break-all; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
-  .card h2 { font-size: 1.1rem; margin: 0 0 4px; }
-  .card p { margin: 0 0 8px; color: var(--muted); }
-  .card a { color: var(--accent); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--mono); }
+  a { color: inherit; }
+
+  .bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--pane);
+  }
+  .brand { color: var(--pink); font-size: 14px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-size: 12px; color: var(--pink); background: var(--pink-bg); border-radius: 2px;
+    padding: 3px 10px; text-decoration: none; border: 0; font-family: var(--mono); cursor: pointer;
+  }
+  .chip:hover { background: rgba(236, 72, 153, .2); }
+
+  main {
+    max-width: 980px; margin: 0 auto; padding: 16px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .pane { background: var(--pane); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); min-width: 0; }
+  .pane.wide { grid-column: 1 / -1; }
+  .pane.accent { border-color: rgba(236, 72, 153, .45); }
+  .head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; border-bottom: 1px solid var(--line);
+    font-size: 12px; color: var(--title); text-transform: uppercase; letter-spacing: .02em;
+  }
+  .pane.accent .head { color: var(--pink); }
+  .ctl { letter-spacing: 10px; color: var(--title); user-select: none; }
+  .body { padding: 18px 20px; }
+
+  p { margin: 0 0 12px; }
+  .prompt {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin: 14px 0 12px;
+    font-size: 13px; overflow-x: auto;
+  }
+  .prompt .sign { color: var(--pink); }
+  .prompt code { color: var(--white); word-break: break-all; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    font: 500 13px var(--mono); padding: 7px 14px; border-radius: 4px; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+  }
+  .btn.pink { background: var(--pink-strong); border-color: var(--pink-strong); color: #0a0a10; }
+  .btn:hover { filter: brightness(1.15); }
+
+  .cards { display: grid; gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+  .card h3 { margin: 0; color: var(--white); font-size: 16px; font-weight: 700; }
+  .meta { font-size: 12px; color: var(--dim); margin: 2px 0 10px; }
+  .meta .ver { color: var(--pink); }
+  .card p { font-size: 14px; color: var(--text); }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; color: var(--pink); background: var(--pink-bg); border-radius: 2px; padding: 2px 8px; text-decoration: none; }
+
+  ol { margin: 0; padding-left: 22px; font-size: 14px; }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--pink); }
+  .muted { color: var(--dim); font-size: 13px; }
+
+  .toast {
+    position: fixed; right: 16px; bottom: 16px; font-size: 12px; color: var(--pink);
+    background: var(--pane); border: 1px solid rgba(236, 72, 153, .45); border-radius: 4px; padding: 6px 12px;
+    opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>ladyluh's VRChat tools</h1>
-  <p class="lead">Avatar tools for the VRChat Creator Companion.</p>
-  <a class="add" href="vcc://vpm/addRepo?url=https%3A%2F%2Fvpm.ladyluh.dev%2Findex.json">Add to VCC</a>
-  <div class="url">Or add this listing by hand in VCC → Settings → Packages: <code>https://vpm.ladyluh.dev/index.json</code></div>
+<nav class="bar">
+  <span class="brand">→ vpm</span>
+  <div class="chips">
+    <a class="chip" href="vcc://vpm/addRepo?url=https%3A%2F%2Fvpm.ladyluh.dev%2Findex.json">add to vcc</a>
+    <a class="chip" href="index.json">index.json</a>
+    <a class="chip" href="https://github.com/luna-gelmini">github</a>
+    <a class="chip" href="https://ladyluh.dev">ladyluh.dev</a>
+  </div>
+</nav>
 
-  <div class="card">
-    <h2>questkit</h2>
-    <p>Quest Planner: analyzes a PC avatar, explains the best Quest conversion for every part, and builds an optimized Quest copy.</p>
-    <a href="https://github.com/luna-gelmini/QuestKit">github.com/luna-gelmini/QuestKit</a>
-  </div>
-  <div class="card">
-    <h2>ps1ify</h2>
-    <p>Turns avatars into cute PS1-style ones: low-poly, baked facets, dithered pixel textures. Quest and PC. Needs questkit (VCC adds it for you).</p>
-    <a href="https://github.com/luna-gelmini/AvatarPSXify">github.com/luna-gelmini/AvatarPSXify</a>
-  </div>
-  <div class="card">
-    <h2>Source Avatar Setup (source2vrchat)</h2>
-    <p>Unity half of source2vrchat: sets up Garry's Mod and Source Filmmaker models converted with gma2blend as VRChat avatars.</p>
-    <a href="https://github.com/luna-gelmini/Source2VRChat">github.com/luna-gelmini/Source2VRChat</a>
-  </div>
+<main>
+  <section class="pane accent wide">
+    <div class="head"><span>~/readme.md</span><span class="ctl">–□×</span></div>
+    <div class="body">
+      <p>VRChat Creator Companion listing for my avatar tools. Add it once and VCC installs and updates them like any other package.</p>
+      <div class="prompt"><span class="sign">$</span><code id="url">https://vpm.ladyluh.dev/index.json</code></div>
+      <div class="btns">
+        <a class="btn pink" href="vcc://vpm/addRepo?url=https%3A%2F%2Fvpm.ladyluh.dev%2Findex.json">Add to VCC</a>
+        <button class="btn" id="copy" type="button">Copy URL</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pane wide">
+    <div class="head"><span>~/packages</span><span class="ctl">–□×</span></div>
+    <div class="body cards">
+      <article class="card">
+        <h3>questkit</h3>
+        <div class="meta">dev.ladyluh.questkit · <span class="ver" data-pkg="dev.ladyluh.questkit">v1.0.0</span></div>
+        <p>Quest Planner. Looks at a PC avatar, picks the best Quest version of every material, texture, PhysBone and mesh, says why, and builds a separate Quest copy you can tweak.</p>
+        <div class="tags"><a class="tag" href="https://github.com/luna-gelmini/QuestKit">github</a><a class="tag" href="https://github.com/luna-gelmini/QuestKit/releases">releases</a></div>
+      </article>
+      <article class="card">
+        <h3>ps1ify</h3>
+        <div class="meta">dev.ladyluh.ps1ify · <span class="ver" data-pkg="dev.ladyluh.ps1ify">v1.0.0</span> · needs questkit</div>
+        <p>Turns an avatar into a cute PS1-style one: low-poly, baked facets, dithered pixel textures. Builds a Quest and a PC version and keeps the face's expressions.</p>
+        <div class="tags"><a class="tag" href="https://github.com/luna-gelmini/AvatarPSXify">github</a><a class="tag" href="https://github.com/luna-gelmini/AvatarPSXify/releases">releases</a></div>
+      </article>
+      <article class="card">
+        <h3>source2vrchat</h3>
+        <div class="meta">dev.ladyluh.source2vrchat · <span class="ver" data-pkg="dev.ladyluh.source2vrchat">v1.0.0</span></div>
+        <p>Unity half of source2vrchat. Sets up Garry's Mod and Source Filmmaker models converted with gma2blend: humanoid rig, materials, eye look and helper bone constraints.</p>
+        <div class="tags"><a class="tag" href="https://github.com/luna-gelmini/Source2VRChat">github</a><a class="tag" href="https://github.com/luna-gelmini/Source2VRChat/releases">releases</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="pane wide">
+    <div class="head"><span>/etc/help</span><span class="ctl">–□×</span></div>
+    <div class="body">
+      <ol>
+        <li>Press <b>Add to VCC</b>, or paste the URL above in VCC under Settings → Packages → Add Repository.</li>
+        <li>Manage your avatar project in VCC and add the packages you want. ps1ify brings questkit along.</li>
+        <li>In Unity, they're under the <b>Tools</b> menu.</li>
+      </ol>
+      <p class="muted" style="margin:12px 0 0">Not using VCC? Every repo has a .unitypackage in its releases.</p>
+    </div>
+  </section>
 </main>
+<div class="toast" id="toast" role="status">copied</div>
+<script>
+  const toast = document.getElementById('toast');
+  document.getElementById('copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(document.getElementById('url').textContent); toast.textContent = 'copied'; }
+    catch { toast.textContent = 'copy failed, select the url instead'; }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1500);
+  });
+  // Keep the version labels in step with index.json.
+  fetch('index.json').then(r => r.json()).then(listing => {
+    document.querySelectorAll('.ver').forEach(el => {
+      const v = Object.keys(listing.packages?.[el.dataset.pkg]?.versions || {})
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).pop();
+      if (v) el.textContent = 'v' + v;
+    });
+  }).catch(() => {});
+</script>
 </body>
 </html>
