@@ -1,0 +1,81 @@
+{
+  "name": "ladyluh's VRChat tools",
+  "id": "dev.ladyluh.vpm",
+  "url": "https://luna-gelmini.github.io/vpm/index.json",
+  "author": "luna-gelmini",
+  "packages": {
+    "dev.ladyluh.questkit": {
+      "versions": {
+        "1.0.0": {
+          "name": "dev.ladyluh.questkit",
+          "displayName": "questkit",
+          "version": "1.0.0",
+          "unity": "2022.3",
+          "description": "Quest Planner for VRChat avatars: analyzes a PC avatar, explains the best Quest conversion for every part, and builds an optimized Quest copy.",
+          "author": {
+            "name": "luna-gelmini",
+            "url": "https://github.com/luna-gelmini"
+          },
+          "license": "MIT",
+          "documentationUrl": "https://github.com/luna-gelmini/QuestKit",
+          "url": "https://github.com/luna-gelmini/QuestKit/releases/download/v1.0.0/dev.ladyluh.questkit-1.0.0.zip",
+          "vpmDependencies": {
+            "com.vrchat.avatars": ">=3.7.0"
+          },
+          "legacyFolders": {
+            "Assets\\QuestKit": ""
+          },
+          "zipSHA256": "3e8c433cbb4dfcf67509a78f3b320ed8cf917be809f3b55467cb33babfb5b036"
+        }
+      }
+    },
+    "dev.ladyluh.ps1ify": {
+      "versions": {
+        "1.0.0": {
+          "name": "dev.ladyluh.ps1ify",
+          "displayName": "ps1ify",
+          "version": "1.0.0",
+          "unity": "2022.3",
+          "description": "Turns VRChat avatars into cute PS1-style ones: low-poly, baked facets, dithered pixel textures. Builds a Quest and a PC copy. Built on questkit.",
+          "author": {
+            "name": "luna-gelmini",
+            "url": "https://github.com/luna-gelmini"
+          },
+          "license": "MIT",
+          "documentationUrl": "https://github.com/luna-gelmini/AvatarPSXify",
+          "url": "https://github.com/luna-gelmini/AvatarPSXify/releases/download/v1.0.0/dev.ladyluh.ps1ify-1.0.0.zip",
+          "vpmDependencies": {
+            "com.vrchat.avatars": ">=3.7.0",
+            "dev.ladyluh.questkit": ">=1.0.0"
+          },
+          "legacyFolders": {
+            "Assets\\PS1ify": ""
+          },
+          "zipSHA256": "a49f01c66770808ea0672c30edd7add2d03bc05d2aff47611637c8e015bf83ad"
+        }
+      }
+    },
+    "dev.ladyluh.source2vrchat": {
+      "versions": {
+        "1.0.0": {
+          "name": "dev.ladyluh.source2vrchat",
+          "displayName": "Source Avatar Setup (source2vrchat)",
+          "version": "1.0.0",
+          "unity": "2022.3",
+          "description": "Unity half of source2vrchat: sets up Garry's Mod / Source Filmmaker models converted by gma2blend as VRChat avatars.",
+          "author": {
+            "name": "luna-gelmini",
+            "url": "https://github.com/luna-gelmini"
+          },
+          "license": "MIT",
+          "documentationUrl": "https://github.com/luna-gelmini/Source2VRChat",
+          "url": "https://github.com/luna-gelmini/Source2VRChat/releases/download/v1.0.0/dev.ladyluh.source2vrchat-1.0.0.zip",
+          "vpmDependencies": {
+            "com.vrchat.avatars": ">=3.7.0"
+          },
+          "zipSHA256": "886339d06fd1a1d7828a9a39886d56ad4b3957741e89252fa4b56408d1bfcef4"
+        }
+      }
+    }
+  }
+}

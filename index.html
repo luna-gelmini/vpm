@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ladyluh's VRChat tools</title>
+<style>
+  :root { --bg: #f7f5f8; --fg: #241f2b; --muted: #6b6475; --card: #ffffff; --line: #e4dfe9; --accent: #c2477f; --accent-fg: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17141c; --fg: #ece8f1; --muted: #a39cad; --card: #211d28; --line: #332d3d; --accent: #e3699f; --accent-fg: #17141c; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+  h1 { font-size: 1.8rem; margin: 0 0 6px; }
+  p.lead { color: var(--muted); margin: 0 0 28px; }
+  .add { display: inline-block; background: var(--accent); color: var(--accent-fg); text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
+  .url { margin: 14px 0 36px; font-size: .9rem; color: var(--muted); }
+  code { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; font-size: .88em; word-break: break-all; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .card h2 { font-size: 1.1rem; margin: 0 0 4px; }
+  .card p { margin: 0 0 8px; color: var(--muted); }
+  .card a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>ladyluh's VRChat tools</h1>
+  <p class="lead">Avatar tools for the VRChat Creator Companion.</p>
+  <a class="add" href="vcc://vpm/addRepo?url=https%3A%2F%2Fluna-gelmini.github.io%2Fvpm%2Findex.json">Add to VCC</a>
+  <div class="url">Or add this listing by hand in VCC → Settings → Packages: <code>https://luna-gelmini.github.io/vpm/index.json</code></div>
+
+  <div class="card">
+    <h2>questkit</h2>
+    <p>Quest Planner: analyzes a PC avatar, explains the best Quest conversion for every part, and builds an optimized Quest copy.</p>
+    <a href="https://github.com/luna-gelmini/QuestKit">github.com/luna-gelmini/QuestKit</a>
+  </div>
+  <div class="card">
+    <h2>ps1ify</h2>
+    <p>Turns avatars into cute PS1-style ones: low-poly, baked facets, dithered pixel textures. Quest and PC. Needs questkit (VCC adds it for you).</p>
+    <a href="https://github.com/luna-gelmini/AvatarPSXify">github.com/luna-gelmini/AvatarPSXify</a>
+  </div>
+  <div class="card">
+    <h2>Source Avatar Setup (source2vrchat)</h2>
+    <p>Unity half of source2vrchat: sets up Garry's Mod and Source Filmmaker models converted with gma2blend as VRChat avatars.</p>
+    <a href="https://github.com/luna-gelmini/Source2VRChat">github.com/luna-gelmini/Source2VRChat</a>
+  </div>
+</main>
+</body>
+</html>
