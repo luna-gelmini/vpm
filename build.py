@@ -29,6 +29,7 @@ LOCAL_PACKAGES = [
     ("questkit", "QuestKit"),
     ("ps1ify", "PS1ify"),
     ("source2vrchat/unity", "Source2VRChat"),
+    ("visememaker", "VisemeMaker"),
 ]
 
 SKIP = {".git", ".github", ".gitignore", ".gitattributes", "release", "dist", "__pycache__"}

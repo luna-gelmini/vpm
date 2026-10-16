@@ -16,6 +16,7 @@ import json
 import os
 import shutil
 import sys
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -32,6 +33,7 @@ REPOS = [
     "luna-gelmini/QuestKit",
     "luna-gelmini/AvatarPSXify",
     "luna-gelmini/Source2VRChat",
+    "luna-gelmini/VisemeMaker",
 ]
 
 STATIC = ["index.html", "CNAME"]
@@ -49,7 +51,12 @@ def get(url, accept="application/vnd.github+json"):
 def releases(repo):
     page = 1
     while True:
-        batch = json.loads(get("https://api.github.com/repos/%s/releases?per_page=100&page=%d" % (repo, page)))
+        try:
+            batch = json.loads(get("https://api.github.com/repos/%s/releases?per_page=100&page=%d" % (repo, page)))
+        except urllib.error.HTTPError as e:
+            # A repo that doesn't exist (yet) or is private shouldn't take the whole listing down.
+            print("warning: %s: %s, skipped" % (repo, e))
+            return
         if not batch:
             return
         for r in batch:
