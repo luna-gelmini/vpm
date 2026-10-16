@@ -1,7 +1,7 @@
 # vpm
 
 VRChat Creator Companion listing for questkit, ps1ify and source2vrchat, served with GitHub Pages
-at https://luna-gelmini.github.io/vpm/.
+at https://vpm.ladyluh.dev/.
 
 ## Releasing a new version
 
@@ -13,4 +13,5 @@ at https://luna-gelmini.github.io/vpm/.
    `release/<package>/`. The zip's file name must match the `url` in `package.json`.
 4. Commit and push `index.json` here. VCC sees the new version after GitHub Pages updates.
 
-Old versions stay in `index.json`, so people can roll back.
+Old versions stay in `index.json`, so people can roll back. `build.py` skips versions that are
+already listed, because their zips are already uploaded and a rebuild would change the checksum.

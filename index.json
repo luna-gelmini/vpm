@@ -1,7 +1,7 @@
 {
   "name": "ladyluh's VRChat tools",
   "id": "dev.ladyluh.vpm",
-  "url": "https://luna-gelmini.github.io/vpm/index.json",
+  "url": "https://vpm.ladyluh.dev/index.json",
   "author": "luna-gelmini",
   "packages": {
     "dev.ladyluh.questkit": {

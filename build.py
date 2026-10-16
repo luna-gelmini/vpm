@@ -6,7 +6,8 @@ release/<name>/:
   <Folder>-<version>.unitypackage  drag-into-Unity install under Assets/<Folder>
 and finally regenerates index.json (the listing VCC reads) with each zip's SHA-256.
 
-    python build.py            build everything
+    python build.py            build versions not yet in index.json
+    python build.py --force    also rebuild versions already listed (only before uploading them)
     python build.py --metas    only add missing .meta files
 """
 import hashlib
@@ -24,7 +25,7 @@ TOOLS = os.path.dirname(HERE)
 LISTING = {
     "name": "ladyluh's VRChat tools",
     "id": "dev.ladyluh.vpm",
-    "url": "https://luna-gelmini.github.io/vpm/index.json",
+    "url": "https://vpm.ladyluh.dev/index.json",
     "author": "luna-gelmini",
 }
 
@@ -130,6 +131,7 @@ def sha256(path):
 
 def main():
     metas_only = "--metas" in sys.argv
+    force = "--force" in sys.argv
     listing = dict(LISTING, packages={})
     index_path = os.path.join(HERE, "index.json")
     if os.path.exists(index_path):
@@ -144,6 +146,10 @@ def main():
         name, version = pkg["name"], pkg["version"]
         print("%s %s: %d .meta files added" % (name, version, added))
         if metas_only:
+            continue
+        # A listed version's zip is already uploaded; rebuilding it would change its SHA-256.
+        if not force and version in listing["packages"].get(name, {}).get("versions", {}):
+            print("  already released, skipped (bump the version, or use --force before uploading)")
             continue
 
         out_dir = os.path.join(HERE, "release", name)
