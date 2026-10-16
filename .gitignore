@@ -1,2 +1,4 @@
 release/
+site/
+dist/
 __pycache__/

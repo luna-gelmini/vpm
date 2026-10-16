@@ -1,0 +1,48 @@
+name: Listing
+
+# Rebuilds index.json from the package repos' releases and deploys the site to GitHub Pages.
+# Runs on push, every hour, on demand, and when a package release pings it.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [package-released]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build listing
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python update_listing.py site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

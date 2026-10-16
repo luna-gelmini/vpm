@@ -1,16 +1,18 @@
-"""Builds release files for the packages listed in PACKAGES and the VCC listing.
+"""Builds the release files of a Unity package: the VCC zip and a .unitypackage.
 
-For each package it adds missing Unity .meta files to the package folder, then writes into
-release/<name>/:
-  <name>-<version>.zip           the VCC / VPM package
-  <Folder>-<version>.unitypackage  drag-into-Unity install under Assets/<Folder>
-and finally regenerates index.json (the listing VCC reads) with each zip's SHA-256.
+    python build.py --package DIR --folder NAME [--tag vX.Y.Z] [--out DIR]
+        Builds one package (what the release workflows run). Fails if a .meta file is missing,
+        or if --tag doesn't match the version in package.json.
+    python build.py
+        Builds every package in LOCAL_PACKAGES into release/<name>/.
+    python build.py --metas
+        Adds missing .meta files to every package in LOCAL_PACKAGES.
 
-    python build.py            build versions not yet in index.json
-    python build.py --force    also rebuild versions already listed (only before uploading them)
-    python build.py --metas    only add missing .meta files
+Output names:
+    <name>-<version>.zip             the package VCC installs
+    <Folder>-<version>.unitypackage  drag-into-Unity install under Assets/<Folder>
 """
-import hashlib
+import argparse
 import io
 import json
 import os
@@ -20,23 +22,16 @@ import uuid
 import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-TOOLS = os.path.dirname(HERE)
 
-LISTING = {
-    "name": "ladyluh's VRChat tools",
-    "id": "dev.ladyluh.vpm",
-    "url": "https://vpm.ladyluh.dev/index.json",
-    "author": "luna-gelmini",
-}
-
-# Package folder (relative to the tools folder) and the Assets/ folder for the .unitypackage.
-PACKAGES = [
+# For local builds: package folder (relative to the folder holding all the repos) and the
+# Assets/ folder its .unitypackage installs into.
+LOCAL_PACKAGES = [
     ("questkit", "QuestKit"),
     ("ps1ify", "PS1ify"),
     ("source2vrchat/unity", "Source2VRChat"),
 ]
 
-SKIP = {".git", ".gitignore", ".gitattributes", "release", "__pycache__"}
+SKIP = {".git", ".github", ".gitignore", ".gitattributes", "release", "dist", "__pycache__"}
 
 META_HEAD = "fileFormatVersion: 2\nguid: {guid}\n"
 TAIL = "  userData: \n  assetBundleName: \n  assetBundleVariant: \n"
@@ -71,7 +66,6 @@ def ensure_metas(root):
         meta = os.path.join(root, rel) + ".meta"
         if os.path.exists(meta):
             continue
-        guid = uuid.uuid4().hex
         if is_dir:
             body = FOLDER
         elif os.path.basename(rel) == "package.json":
@@ -79,9 +73,13 @@ def ensure_metas(root):
         else:
             body = IMPORTERS.get(os.path.splitext(rel)[1].lower(), DEFAULT)
         with open(meta, "w", newline="\n") as f:
-            f.write(META_HEAD.format(guid=guid) + body)
+            f.write(META_HEAD.format(guid=uuid.uuid4().hex) + body)
         added += 1
     return added
+
+
+def missing_metas(root):
+    return [rel for rel, _ in entries(root) if not os.path.exists(os.path.join(root, rel) + ".meta")]
 
 
 def guid_of(path):
@@ -121,55 +119,53 @@ def build_unitypackage(root, folder, out):
                     add(tar, guid + "/asset", f.read())
 
 
-def sha256(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1 << 16), b""):
-            h.update(chunk)
-    return h.hexdigest()
+def build(root, folder, out_dir, tag=None):
+    missing = missing_metas(root)
+    if missing:
+        sys.exit("Missing .meta files (run build.py --metas locally and commit them):\n  " + "\n  ".join(missing))
+    with open(os.path.join(root, "package.json"), encoding="utf-8") as f:
+        pkg = json.load(f)
+    name, version = pkg["name"], pkg["version"]
+    if tag is not None and tag.lstrip("v") != version:
+        sys.exit("Tag %s doesn't match package.json version %s. Bump the version or fix the tag." % (tag, version))
+    expected_zip = "%s-%s.zip" % (name, version)
+    if not pkg.get("url", "").endswith("/" + expected_zip):
+        print("warning: package.json url doesn't end in %s; VCC uses the listing's url, so this is only cosmetic" % expected_zip)
+
+    os.makedirs(out_dir, exist_ok=True)
+    zip_path = os.path.join(out_dir, expected_zip)
+    pkg_path = os.path.join(out_dir, "%s-%s.unitypackage" % (folder, version))
+    build_zip(root, zip_path)
+    build_unitypackage(root, folder, pkg_path)
+    print(zip_path)
+    print(pkg_path)
+    return pkg
 
 
 def main():
-    metas_only = "--metas" in sys.argv
-    force = "--force" in sys.argv
-    listing = dict(LISTING, packages={})
-    index_path = os.path.join(HERE, "index.json")
-    if os.path.exists(index_path):
-        with open(index_path, encoding="utf-8") as f:
-            listing["packages"] = json.load(f).get("packages", {})
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--package", help="package folder (contains package.json)")
+    ap.add_argument("--folder", help="Assets/ folder name for the .unitypackage")
+    ap.add_argument("--tag", help="release tag; must match the package version")
+    ap.add_argument("--out", default="dist")
+    ap.add_argument("--metas", action="store_true", help="only add missing .meta files to local packages")
+    args = ap.parse_args()
 
-    for rel_root, folder in PACKAGES:
-        root = os.path.join(TOOLS, rel_root)
+    if args.package:
+        if not args.folder:
+            ap.error("--package needs --folder")
+        build(args.package, args.folder, args.out, args.tag)
+        return
+
+    tools = os.path.dirname(HERE)
+    for rel_root, folder in LOCAL_PACKAGES:
+        root = os.path.join(tools, rel_root)
         added = ensure_metas(root)
-        with open(os.path.join(root, "package.json"), encoding="utf-8") as f:
-            pkg = json.load(f)
-        name, version = pkg["name"], pkg["version"]
-        print("%s %s: %d .meta files added" % (name, version, added))
-        if metas_only:
-            continue
-        # A listed version's zip is already uploaded; rebuilding it would change its SHA-256.
-        if not force and version in listing["packages"].get(name, {}).get("versions", {}):
-            print("  already released, skipped (bump the version, or use --force before uploading)")
-            continue
-
-        out_dir = os.path.join(HERE, "release", name)
-        os.makedirs(out_dir, exist_ok=True)
-        zip_path = os.path.join(out_dir, "%s-%s.zip" % (name, version))
-        pkg_path = os.path.join(out_dir, "%s-%s.unitypackage" % (folder, version))
-        build_zip(root, zip_path)
-        build_unitypackage(root, folder, pkg_path)
-
-        entry = dict(pkg)
-        entry["zipSHA256"] = sha256(zip_path)
-        listing["packages"].setdefault(name, {"versions": {}})["versions"][version] = entry
-        print("  " + os.path.relpath(zip_path, HERE))
-        print("  " + os.path.relpath(pkg_path, HERE))
-
-    if not metas_only:
-        with open(index_path, "w", encoding="utf-8", newline="\n") as f:
-            json.dump(listing, f, indent=2, ensure_ascii=False)
-            f.write("\n")
-        print("index.json updated")
+        print("%s: %d .meta files added" % (rel_root, added))
+        if not args.metas:
+            with open(os.path.join(root, "package.json"), encoding="utf-8") as f:
+                name = json.load(f)["name"]
+            build(root, folder, os.path.join(HERE, "release", name))
 
 
 if __name__ == "__main__":
